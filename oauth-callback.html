@@ -1,0 +1,18 @@
+<!-- oauth-callback.html -->
+<!DOCTYPE html>
+<html>
+<head><title>OAuth Callback</title></head>
+<body>
+<script>
+  const params = new URLSearchParams(window.location.hash.substring(1));
+  const token = params.get("access_token");
+
+  if (token) {
+    window.opener.postMessage({ type: "oauth_token", token: token }, "*");
+    window.close();
+  } else {
+    document.body.innerText = "Token non trovato.";
+  }
+</script>
+</body>
+</html>
