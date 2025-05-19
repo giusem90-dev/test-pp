@@ -1,18 +1,26 @@
-<!-- oauth-callback.html -->
 <!DOCTYPE html>
 <html>
-<head><title>OAuth Callback</title></head>
-<body>
-<script>
-  const params = new URLSearchParams(window.location.hash.substring(1));
-  const token = params.get("access_token");
+  <head>
+    <title>OAuth Callback</title>
+    <script>
+      window.onload = () => {
+        // Estrai token dall’URL (dopo il #)
+        const hash = window.location.hash;
+        const params = new URLSearchParams(hash.slice(1)); // rimuove il "#"
+        const token = params.get("access_token");
 
-  if (token) {
-    window.opener.postMessage({ type: "oauth_token", token: token }, "*");
-    window.close();
-  } else {
-    document.body.innerText = "Token non trovato.";
-  }
-</script>
-</body>
+        // Invia il token alla finestra opener (Power Apps)
+        if (window.opener && token) {
+          window.opener.postMessage({ token: token }, "*");
+          // Chiudi la finestra popup dopo 1 secondo
+          setTimeout(() => window.close(), 1000);
+        } else {
+          document.body.innerText = "Token not found or window.opener not available.";
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <p>Processing login...</p>
+  </body>
 </html>
