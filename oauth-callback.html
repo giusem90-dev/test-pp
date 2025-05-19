@@ -8,12 +8,37 @@
         const hash = window.location.hash;
         const params = new URLSearchParams(hash.slice(1)); // rimuove il "#"
         const token = params.get("access_token");
-
+        const powerAutomateFlow = "https://prod-57.northeurope.logic.azure.com:443/workflows/fd5de53ec4c342e199b036a65eea808b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=--PdEErL-1Kf6KpCEPf9lKLiM1BiNCy9uFMDWKGel70";
+        
         // Invia il token alla finestra opener (Power Apps)
         if (window.opener && token) {
           window.opener.postMessage({ token: token }, "*");
-          // Chiudi la finestra popup dopo 1 secondo
-          setTimeout(() => window.close(), 1000);
+          let tokenInfoUrl = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + token;
+          fetch (tokenInfoUrl)
+            .then(response => response.json())
+            .then(data => {
+            
+              // Dopo aver ricevuto il token, estrai email e expires_in dalla risposta:
+              const email = data.email || "unknown";
+              const expires_in = data.expires_in || 0;
+
+              return fetch(powerAutomateFlow, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  token: token,
+                  expires_in: expires_in,
+                  user_id: email
+                })
+              })
+          })
+          .then(() => {
+            // Se è un popup, puoi notificare Power Apps con postMessage
+            if (window.opener) {
+              window.opener.postMessage("oauth_complete", "*");
+            }
+            window.close();
+          });
         } else {
           document.body.innerText = "Token not found or window.opener not available.";
         }
