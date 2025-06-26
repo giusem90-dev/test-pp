@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Redirect PowerApps</title>
+</head>
+<body style="margin:0">
+  <iframe id="powerappframe" width="100%" height="1000px" frameborder="0"></iframe>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const regione = params.get("regione") || "";
+    const negozio = params.get("negozio") || "";
+
+    const baseUrl = "https://apps.powerapps.com/play/e/default-ef5926db-9bdf-4f9f-9066-d8e7f03943f7/a/4e62bc0a-144c-4473-8ae5-ba8ea00abbb0?tenantId=ef5926db-9bdf-4f9f-9066-d8e7f03943f7&hint=7dc8a01f-7b26-46e5-a316-bd806da27f0d&sourcetime=1750932744348&source=portal";
+
+    const fullUrl = `${baseUrl}&regione=${encodeURIComponent(regione)}&negozio=${encodeURIComponent(negozio)}`;
+
+    document.getElementById("powerappframe").src = fullUrl;
+  </script>
+</body>
+</html>
